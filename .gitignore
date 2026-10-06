@@ -1,0 +1,6 @@
+node_modules/
+main.js
+.test-build/
+test-vault/.obsidian/
+test-vault/Books/Untitled*.md
+test-vault/Outside base.md

@@ -1,0 +1,21 @@
+{
+  "name": "bases-templates",
+  "version": "0.1.0",
+  "description": "An Obsidian plugin: the New button in a base creates the note from a chosen template.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc --noEmit && node esbuild.config.mjs production",
+    "test": "esbuild test/template.test.ts --bundle --platform=node --format=esm --outfile=.test-build/template.test.mjs --log-level=warning && node --test .test-build/template.test.mjs",
+    "lint": "eslint src"
+  },
+  "author": "Fuad Laguda",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-obsidianmd": "^0.4.2",
+    "obsidian": "latest",
+    "typescript": "^5.6.0"
+  }
+}
