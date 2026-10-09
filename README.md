@@ -20,6 +20,7 @@ To set it for every view in a base at once, or to change it later, go to **Setti
 - The template's text goes under the properties.
 - `{{title}}`, `{{date}}`, `{{time}}`, `{{date:FORMAT}}` and `{{time:FORMAT}}` are filled in, as in Obsidian's own Templates.
 - If the template uses Templater (`<% ... %>`) and Templater is installed, Templater fills it in, and the base's values are kept.
+- Views made by the Split Groups plugin are left alone, since Split Groups sets its own template per view.
 
 Only notes made with a base's **New** are touched. Notes made any other way are left alone. It does not rely on the new note being called "Untitled", so it works in every language.
 

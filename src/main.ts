@@ -34,6 +34,8 @@ export default class BasesTemplatesPlugin extends Plugin {
       if (!target) return;
       for (const leaf of this.app.workspace.getLeavesOfType("bases")) {
         if (!leaf.view.containerEl.contains(target)) continue;
+        // Split groups views make their own notes from their own template, so they are left alone
+        if (leaf.view.containerEl.querySelector(".split-groups")) return;
         const state = leaf.getViewState().state as { file?: string; viewName?: string } | undefined;
         if (state?.file) this.lastBase = { base: state.file, view: state.viewName ?? "", at: Date.now() };
         return;
@@ -102,7 +104,9 @@ export default class BasesTemplatesPlugin extends Plugin {
       });
       return;
     }
-    const filled = fillPlaceholders(text, file.basename, (fmt) => moment().format(fmt));
+    // Typed here so the check holds where moment's own types are not installed
+    const now = moment as unknown as () => { format(fmt: string): string };
+    const filled = fillPlaceholders(text, file.basename, (fmt) => now().format(fmt));
     const { yaml, body } = splitFrontmatter(filled);
     if (yaml) {
       const props = (parseYaml(yaml) as Record<string, unknown> | null) ?? {};
