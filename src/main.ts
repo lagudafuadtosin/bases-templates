@@ -1,4 +1,4 @@
-import { App, FuzzySuggestModal, Notice, Plugin, PluginSettingTab, Setting, TFile, moment, parseYaml } from "obsidian";
+import { App, FuzzySuggestModal, Notice, Plugin, PluginSettingTab, Setting, TFile, moment, parseYaml, type SettingDefinitionItem } from "obsidian";
 import { appendBody, fillPlaceholders, findRule, mergeProps, splitFrontmatter, type Rule } from "./template";
 
 // Bases Templates: the New button in a base makes the note from a template chosen for that base, or for
@@ -172,57 +172,57 @@ class BasesTemplatesTab extends PluginSettingTab {
     super(app, plugin);
   }
 
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
+  getSettingDefinitions(): SettingDefinitionItem[] {
     const plugin = this.plugin;
+    const bases = () => this.app.vault.getFiles().filter((f) => f.extension === "base").map((f) => f.path).sort();
+    const templates = () => plugin.templateFiles().map((f) => f.path);
 
-    new Setting(containerEl)
-      .setName("Templates folder")
-      .setDesc("The template lists show the notes in this folder. Leave it empty to show every note.")
-      .addText((t) => t.setValue(plugin.settings.folder).onChange(async (v) => {
-        plugin.settings.folder = v.trim();
-        await plugin.saveSettings();
-      }));
-
-    new Setting(containerEl).setName("Template for each base").setHeading();
-    containerEl.createEl("p", {
-      cls: "setting-item-description",
-      text: "Each line picks the template a base uses when you press its button for a new note. Leave the view empty for every view in that base, and a line for one view wins over that. Quickest way: open the base and run the command to choose the template for this base view.",
-    });
-
-    const bases = this.app.vault.getFiles().filter((f) => f.extension === "base").map((f) => f.path).sort();
-    const templates = plugin.templateFiles().map((f) => f.path);
-
-    plugin.settings.rules.forEach((rule, i) => {
-      const row = new Setting(containerEl);
-      row.addDropdown((d) => {
-        for (const b of new Set([rule.base, ...bases])) if (b) d.addOption(b, b);
-        d.setValue(rule.base).onChange(async (v) => { rule.base = v; await plugin.saveSettings(); });
-      });
-      row.addText((t) => t.setPlaceholder("Every view").setValue(rule.view).onChange(async (v) => {
-        rule.view = v.trim();
-        await plugin.saveSettings();
-      }));
-      row.addDropdown((d) => {
-        for (const p of new Set([rule.template, ...templates])) if (p) d.addOption(p, p);
-        d.setValue(rule.template).onChange(async (v) => { rule.template = v; await plugin.saveSettings(); });
-      });
-      row.addExtraButton((b) => b.setIcon("trash").setTooltip("Remove").onClick(async () => {
-        plugin.settings.rules.splice(i, 1);
-        await plugin.saveSettings();
-        this.display();
-      }));
-    });
-
-    new Setting(containerEl).addButton((b) => b.setButtonText("Add a line").onClick(async () => {
-      if (!bases.length || !templates.length) {
-        new Notice("Add a base and a template note to your vault first.");
-        return;
-      }
-      plugin.settings.rules.push({ base: bases[0], view: "", template: templates[0] });
-      await plugin.saveSettings();
-      this.display();
-    }));
+    return [
+      {
+        name: "Templates folder",
+        desc: "The template lists show the notes in this folder. Leave it empty to show every note.",
+        control: { type: "folder", key: "folder" },
+      },
+      {
+        type: "list",
+        heading: "Template for each base",
+        emptyState: "Each line picks the template a base uses when you press its button for a new note. Leave the view empty for every view in that base, and a line for one view wins over that. Quickest way: open the base and run the command to choose the template for this base view.",
+        items: plugin.settings.rules.map((rule) => ({
+          name: `Template for ${rule.base}`,
+          render: (setting: Setting) => {
+            // The dropdowns say which base, view and template, so no label
+            setting.infoEl.remove();
+            setting.addDropdown((d) => {
+              for (const b of new Set([rule.base, ...bases()])) if (b) d.addOption(b, b);
+              d.setValue(rule.base).onChange(async (v) => { rule.base = v; await plugin.saveSettings(); });
+            });
+            setting.addText((t) => t.setPlaceholder("Every view").setValue(rule.view).onChange(async (v) => {
+              rule.view = v.trim();
+              await plugin.saveSettings();
+            }));
+            setting.addDropdown((d) => {
+              for (const p of new Set([rule.template, ...templates()])) if (p) d.addOption(p, p);
+              d.setValue(rule.template).onChange(async (v) => { rule.template = v; await plugin.saveSettings(); });
+            });
+          },
+        })),
+        onDelete: (i) => {
+          plugin.settings.rules.splice(i, 1);
+          void plugin.saveSettings().then(() => this.update());
+        },
+        addItem: {
+          name: "Add a line",
+          action: () => {
+            const b = bases(), t = templates();
+            if (!b.length || !t.length) {
+              new Notice("Add a base and a template note to your vault first.");
+              return;
+            }
+            plugin.settings.rules.push({ base: b[0], view: "", template: t[0] });
+            void plugin.saveSettings().then(() => this.update());
+          },
+        },
+      },
+    ];
   }
 }

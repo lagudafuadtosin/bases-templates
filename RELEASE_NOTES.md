@@ -1,1 +1,1 @@
-First release. Press New in a base and get a note made from the template chosen for that base or view. The base keeps the values its filters need, Templater templates work when Templater is installed, and it works in every language. Needs Obsidian 1.10.2 or later.
+First release. Press New in a base and get a note made from the template chosen for that base or view. The base keeps the values its filters need, Templater templates work when Templater is installed, and it works in every language. Needs Obsidian 1.13 or later.
