@@ -1,6 +1,6 @@
 {
   "name": "bases-templates",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An Obsidian plugin: the New button in a base creates the note from a chosen template.",
   "main": "main.js",
   "scripts": {

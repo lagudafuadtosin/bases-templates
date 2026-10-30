@@ -1,1 +1,1 @@
-First release. Press New in a base and get a note made from the template chosen for that base or view. The base keeps the values its filters need, Templater templates work when Templater is installed, and it works in every language. Needs Obsidian 1.13 or later.
+New in a base embedded in a note with ![[Name.base]] now makes the note from the template too. A view named in the link, like ![[Name.base#View]], or picked in the embed's own menu uses that view's template.

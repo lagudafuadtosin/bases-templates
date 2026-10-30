@@ -1,7 +1,7 @@
 {
   "id": "bases-templates",
   "name": "Bases Templates",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.13.0",
   "description": "Makes the New button in a base create the note from a template you choose, for each base or each view.",
   "author": "Fuad Laguda",

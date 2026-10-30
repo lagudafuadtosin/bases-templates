@@ -32,6 +32,18 @@ export default class BasesTemplatesPlugin extends Plugin {
     const note = (evt: Event) => {
       const target = evt.target instanceof Node ? evt.target : null;
       if (!target) return;
+      // A base embedded in a note with ![[Name.base]] sits inside that note's tab, not a base tab
+      const embed = (target.instanceOf(Element) ? target : target.parentElement)?.closest(".bases-embed");
+      if (embed) {
+        if (embed.querySelector(".split-groups")) return;
+        const [link, linkView = ""] = (embed.getAttribute("src") ?? "").split("#");
+        const from = this.app.workspace.getActiveFile()?.path ?? "";
+        const base = link ? this.app.metadataCache.getFirstLinkpathDest(link, from) : null;
+        // The view picked in the embed's own menu, or the one named in the link
+        const view = embed.querySelector(".bases-toolbar-views-menu")?.textContent?.trim() || linkView;
+        if (base) this.lastBase = { base: base.path, view, at: Date.now() };
+        return;
+      }
       for (const leaf of this.app.workspace.getLeavesOfType("bases")) {
         if (!leaf.view.containerEl.contains(target)) continue;
         // Split groups views make their own notes from their own template, so they are left alone

@@ -12,6 +12,8 @@ This is the behaviour asked for in the forum thread [Bases: New With Template (f
 
 To set it for every view in a base at once, or to change it later, go to **Settings → Bases Templates**. Each line is a base, a view (leave it empty for every view) and a template. A line for one view wins over a line for the whole base.
 
+It works the same for a base embedded in a note with `![[Name.base]]`. The view named in the link (`![[Name.base#View]]`) or picked in the embed's menu decides which line is used. A base written straight into a note as a code block has no file to pick, so it gets a blank note.
+
 ## What goes into the new note
 
 - The template's properties are added to the note.
